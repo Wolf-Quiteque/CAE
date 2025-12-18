@@ -1301,26 +1301,26 @@
     </div>
 </div>
 
-   <script>
+ <script>
     // Your API endpoint - Update this with your actual API URL
     const API_URL = 'https://hs-node-api.vercel.app/api'; // Change this to your actual API URL
     
     // Speakers data from the image
     const speakers = [
-        { name: "HELIO SANTANA", role: "Palestrante" },
-        { name: "MARIA TERESA", role: "Palestrante" },
-        { name: "NIUKA CASIMIRO", role: "Palestrante" },
-        { name: "CATARINA ANTONIO", role: "Palestrante" },
-        { name: "DAVID MOMA", role: "Palestrante" },
-        { name: "ÁDER MIRANDA", role: "Palestrante" },
-        { name: "ROMEU MAIATO", role: "Palestrante" },
-        { name: "MARIA PONGUE", role: "Organizadora" },
-        { name: "THE TÓRIO", role: "Organizador" },
-        { name: "MUANZA EMANUEL", role: "Organizador" },
-        { name: "JAIME BEIRÃO", role: "Organizador" },
-        { name: "MAURO MUNANA", role: "Organizador" },
-        { name: "GILBERTO CIPRIANO", role: "Organizador" },
-        { name: "LISANDRA ESPERANÇA", role: "Decoração" }
+        { name: "HELIO SANTANA", role: "Orador" },
+        { name: "MARIA TERESA", role: "Orador" },
+        { name: "NIUKA CASIMIRO", role: "Orador" },
+        { name: "CATARINA ANTONIO", role: "Orador" },
+        { name: "DAVID MOMA", role: "Orador" },
+        { name: "ÁDER MIRANDA", role: "Orador" },
+        { name: "ROMEU MAIATO", role: "Orador" },
+        { name: "MARIA PONGUE", role: "Orador" },
+        { name: "THE TÓRIO", role: "Orador" },
+        { name: "MUANZA EMANUEL", role: "Orador" },
+        { name: "JAIME BEIRÃO", role: "Orador" },
+        { name: "MAURO MUNANA", role: "Orador" },
+        { name: "GILBERTO CIPRIANO", role: "Orador" },
+        { name: "LISANDRA ESPERANÇA", role: "Orador" }
     ];
 
     // Populate speakers grid
@@ -1369,8 +1369,8 @@
         loadingOverlay.classList.add('active');
         
         try {
-            // Send data to API
-            const response = await fetch(`${API_URL}/attendance`, {
+            // Send data to API with SMS option
+            const response = await fetch(`${API_URL}/attendance-with-sms`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1388,7 +1388,14 @@
             
             if (response.ok && result.success) {
                 // Success - show success message
-                showSuccess('Presença Confirmada!', result.message || 'Obrigado por confirmar sua presença no evento!');
+                const smsMessage = result.data?.smsSent ? 
+                    'Receberá uma mensagem de confirmação no seu telefone!' : 
+                    'Sua presença foi registada com sucesso!';
+                    
+                showSuccess(
+                    'Presença Confirmada!', 
+                    `${result.message} ${smsMessage}`
+                );
                 
                 // Reset form
                 attendanceForm.reset();
