@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conferência Aprenda & Empreenda</title>
+    <title>Aprenda & Empreenda | Marcar Presença</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,16 +15,886 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary: #000000;
+            --secondary: #B22222;
+            --accent: #D32F2F;
+            --light: #1A1A1A;
+            --dark: #0A0A0A;
+            --text: #FFFFFF;
+            --text-secondary: #CCCCCC;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            --gradient: linear-gradient(135deg, #000000 0%, #1A1A1A 100%);
+            --red-gradient: linear-gradient(135deg, #B22222 0%, #D32F2F 100%);
+            --red-gradient-hover: linear-gradient(135deg, #D32F2F 0%, #FF5252 100%);
+            --section-gradient: linear-gradient(180deg, #0A0A0A 0%, #1A1A1A 100%);
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a0000 0%, #4a0000 50%, #ff4500 100%);
-            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text);
+            background-color: var(--primary);
+            line-height: 1.6;
             overflow-x: hidden;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header with Large Logo */
+        header {
+            background: var(--gradient);
+            padding: 20px 0 0;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 3px solid var(--secondary);
+        }
+
+        .header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-header-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            width: 100%;
+            animation: logoSlideDown 1.2s ease-out;
+            position: relative;
+        }
+
+        .logo-header {
+            height: 150px; /* 3x larger than before */
+            filter: drop-shadow(0 0 20px rgba(178, 34, 34, 0.7));
+            transition: all 0.5s ease;
+            animation: logoGlow 3s ease-in-out infinite alternate;
+        }
+
+        .logo-header:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 30px rgba(178, 34, 34, 0.9));
+        }
+
+        .header-text {
+            text-align: center;
+            margin-top: 10px;
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+
+        .header-text h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+        }
+
+        .header-text p {
+            color: var(--secondary);
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .event-banner {
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 3px solid var(--secondary);
+            animation: bannerReveal 1.5s ease-out 0.8s both;
+            position: relative;
+            z-index: 1;
+            margin-top: 20px;
+            margin-bottom: -40px; /* Overlap with next section */
+        }
+
+        .event-banner-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.8s ease;
+        }
+
+        .event-banner:hover .event-banner-img {
+            transform: scale(1.03);
+        }
+
+        .event-banner:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(178, 34, 34, 0.2) 0%, transparent 30%, transparent 70%, rgba(0, 0, 0, 0.8) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 100px 0 80px;
+            background: var(--section-gradient);
+            position: relative;
+            overflow: hidden;
+            margin-top: 40px;
+        }
+
+        .hero:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(178, 34, 34, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(178, 34, 34, 0.15) 0%, transparent 40%);
+            z-index: 0;
+            animation: gradientPulse 15s ease-in-out infinite alternate;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .event-info {
+            animation: slideInLeft 1.2s ease-out;
+        }
+
+        .event-date {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .event-date i {
+            margin-right: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        .event-location {
+            font-size: 1.6rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        .event-location i {
+            margin-right: 15px;
+        }
+
+        .event-description {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            line-height: 1.8;
+        }
+
+        .contact-info {
+            background: rgba(26, 26, 26, 0.7);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid var(--secondary);
+            animation: glowPulse 3s infinite alternate;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .contact-info p {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .contact-info i {
+            color: var(--secondary);
+            margin-right: 15px;
+            font-size: 1.3rem;
+        }
+
+        .presenca-form {
+            background: rgba(10, 10, 10, 0.9);
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 2px solid rgba(178, 34, 34, 0.4);
+            backdrop-filter: blur(15px);
+            animation: fadeInRight 1.2s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .presenca-form:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(178, 34, 34, 0.08) 0%, transparent 70%);
+            z-index: -1;
+            animation: rotate 25s linear infinite;
+        }
+
+        .form-title {
+            font-size: 2.2rem;
+            color: var(--text);
+            margin-bottom: 35px;
+            text-align: center;
+            position: relative;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .form-title:after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 4px;
+            background: var(--red-gradient);
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            animation: lineExpand 1.5s ease-out;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text);
+            letter-spacing: 1px;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            color: var(--text);
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(178, 34, 34, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-submit {
+            background: var(--red-gradient);
+            color: white;
+            border: none;
+            padding: 20px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.4s ease;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-submit:hover {
+            background: var(--red-gradient-hover);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(178, 34, 34, 0.5);
+        }
+
+        .btn-submit:active {
+            transform: translateY(-2px);
+        }
+
+        .btn-submit:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.8s ease;
+            z-index: -1;
+        }
+
+        .btn-submit:hover:after {
+            left: 100%;
+        }
+
+        /* Speakers Section */
+        .speakers {
+            padding: 120px 0;
+            background: var(--gradient);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .speakers:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(178, 34, 34, 0.15) 0%, transparent 30%),
+                radial-gradient(circle at 90% 80%, rgba(178, 34, 34, 0.15) 0%, transparent 30%);
+            z-index: 0;
+            animation: gradientShift 10s ease-in-out infinite alternate;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            color: var(--text);
+            margin-bottom: 70px;
+            position: relative;
+            font-weight: 800;
+            z-index: 1;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            width: 180px;
+            height: 5px;
+            background: var(--red-gradient);
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            animation: lineExpand 2s ease-out;
+        }
+
+        .speakers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 35px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .speaker-card {
+            background: rgba(26, 26, 26, 0.8);
+            border-radius: 15px;
+            padding: 35px 25px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.5s ease;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+        }
+
+        .speaker-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(178, 34, 34, 0.15), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.7s ease;
+        }
+
+        .speaker-card:hover:before {
+            transform: translateX(100%);
+        }
+
+        .speaker-card:hover {
+            transform: translateY(-15px) scale(1.05);
+            border-color: rgba(178, 34, 34, 0.6);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .speaker-card:nth-child(2) { animation-delay: 0.1s; }
+        .speaker-card:nth-child(3) { animation-delay: 0.2s; }
+        .speaker-card:nth-child(4) { animation-delay: 0.3s; }
+        .speaker-card:nth-child(5) { animation-delay: 0.4s; }
+        .speaker-card:nth-child(6) { animation-delay: 0.5s; }
+        .speaker-card:nth-child(7) { animation-delay: 0.6s; }
+
+        .speaker-name {
+            font-weight: 600;
+            font-size: 1.4rem;
+            color: var(--text);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .speaker-role {
+            color: var(--secondary);
+            font-size: 1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Event Details */
+        .details {
+            padding: 120px 0;
+            background: var(--section-gradient);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .details:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(178, 34, 34, 0.15) 0%, transparent 60%);
+            z-index: 0;
+            animation: pulseBackground 8s ease-in-out infinite alternate;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 50px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .detail-card {
+            text-align: center;
+            padding: 60px 40px;
+            border-radius: 20px;
+            background: rgba(26, 26, 26, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.6s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+        }
+
+        .detail-card:hover {
+            background: rgba(26, 26, 26, 0.95);
+            transform: translateY(-20px);
+            border-color: rgba(178, 34, 34, 0.6);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .detail-card:hover .detail-icon {
+            color: var(--secondary);
+            transform: scale(1.3) rotate(10deg);
+        }
+
+        .detail-icon {
+            font-size: 4rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            transition: all 0.6s ease;
+            display: inline-block;
+        }
+
+        .detail-title {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .detail-text {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* Partners */
+        .partners {
+            padding: 120px 0;
+            background: var(--gradient);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .partners:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 70%, rgba(178, 34, 34, 0.15) 0%, transparent 50%);
+            z-index: 0;
+            animation: gradientShift 12s ease-in-out infinite alternate;
+        }
+
+        .partners-logos {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 60px;
+            margin-top: 70px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .partner-logo {
+            height: 80px;
+            filter: grayscale(100%) brightness(200%);
+            opacity: 0.9;
+            transition: all 0.6s ease;
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .partner-logo:hover {
+            filter: grayscale(0%) brightness(100%) drop-shadow(0 0 15px rgba(178, 34, 34, 0.8));
+            opacity: 1;
+            transform: scale(1.2) translateY(-8px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: var(--text-secondary);
+            padding: 80px 0 40px;
+            text-align: center;
+            border-top: 2px solid rgba(178, 34, 34, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(178, 34, 34, 0.08), transparent);
+            z-index: 0;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 50px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .footer-logo-img {
+            height: 180px;
+            filter: drop-shadow(0 0 20px rgba(178, 34, 34, 0.6));
+            margin-bottom: 20px;
+            transition: all 0.6s ease;
+            animation: logoFloat 5s ease-in-out infinite alternate;
+        }
+
+        .footer-logo-img:hover {
+            filter: drop-shadow(0 0 30px rgba(178, 34, 34, 0.9));
+            transform: scale(1.08);
+        }
+
+        .footer-logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            line-height: 1;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .footer-logo-text span {
+            color: var(--secondary);
+            display: block;
+        }
+
+        .footer-contact {
+            text-align: right;
+        }
+
+        .footer-contact p {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            font-size: 1.2rem;
+        }
+
+        .footer-contact i {
+            margin-right: 15px;
+            color: var(--secondary);
+            font-size: 1.4rem;
+        }
+
+        .copyright {
+            width: 100%;
+            font-size: 1rem;
+            opacity: 0.8;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Success Message */
+        .success-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: var(--dark);
+            padding: 70px 50px;
+            border-radius: 25px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.95), 0 0 0 2px var(--secondary);
+            text-align: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid var(--secondary);
+            max-width: 90%;
+            width: 600px;
+            backdrop-filter: blur(15px);
+        }
+
+        .success-message.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .success-icon {
+            font-size: 6rem;
+            color: var(--secondary);
+            margin-bottom: 30px;
+            animation: successPulse 2s ease infinite;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.6s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Animations */
+        @keyframes logoSlideDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes logoGlow {
+            0% {
+                filter: drop-shadow(0 0 15px rgba(178, 34, 34, 0.6));
+            }
+            100% {
+                filter: drop-shadow(0 0 25px rgba(178, 34, 34, 0.9));
+            }
+        }
+
+        @keyframes bannerReveal {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                text-shadow: 0 0 10px rgba(178, 34, 34, 0.5);
+            }
+            50% {
+                transform: scale(1.1);
+                text-shadow: 0 0 25px rgba(178, 34, 34, 0.9);
+            }
+            100% {
+                transform: scale(1);
+                text-shadow: 0 0 10px rgba(178, 34, 34, 0.5);
+            }
+        }
+
+        @keyframes successPulse {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 15px rgba(178, 34, 34, 0.8));
+            }
+            50% {
+                transform: scale(1.15);
+                filter: drop-shadow(0 0 35px rgba(178, 34, 34, 1));
+            }
+        }
+
+        @keyframes gradientPulse {
+            0% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes gradientShift {
+            0% {
+                transform: translateX(0) translateY(0);
+            }
+            100% {
+                transform: translateX(30px) translateY(30px);
+            }
+        }
+
+        @keyframes pulseBackground {
+            0% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes lineExpand {
+            0% {
+                width: 0;
+            }
+            100% {
+                width: 100px;
+            }
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes glowPulse {
+            0% {
+                box-shadow: 0 0 15px rgba(178, 34, 34, 0.3);
+            }
+            100% {
+                box-shadow: 0 0 30px rgba(178, 34, 34, 0.6);
+            }
+        }
+
+        @keyframes logoFloat {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-15px);
+            }
         }
 
         @keyframes fadeInUp {
@@ -34,393 +908,401 @@
             }
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-
-        .geometric-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            opacity: 0.1;
-        }
-
-        .geometric-shape {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.1);
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .shape1 {
-            width: 300px;
-            height: 300px;
-            top: 10%;
-            left: 10%;
-            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            animation-delay: 0s;
-        }
-
-        .shape2 {
-            width: 200px;
-            height: 200px;
-            top: 60%;
-            right: 15%;
-            clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-            animation-delay: 2s;
-        }
-
-        .shape3 {
-            width: 250px;
-            height: 250px;
-            bottom: 10%;
-            left: 20%;
-            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-            animation-delay: 4s;
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            padding: 40px 20px;
-            animation: fadeInUp 1s ease-out;
-        }
-
-        .logo-container {
-            margin-bottom: 30px;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        .logo {
-            max-width: 500px;
-            width: 100%;
-            height: auto;
-            filter: drop-shadow(0 10px 30px rgba(255, 69, 0, 0.5));
-        }
-
-        .event-image {
-            width: 100%;
-            max-width: 900px;
-            margin: 30px auto;
-            display: block;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            animation: fadeInUp 1s ease-out 0.3s backwards;
-            transition: transform 0.3s ease;
-        }
-
-        .event-image:hover {
-            transform: scale(1.02);
-        }
-
-        .form-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            padding: 50px;
-            max-width: 600px;
-            margin: 50px auto;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
-            animation: fadeInUp 1s ease-out 0.6s backwards;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .form-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 69, 0, 0.2), transparent);
-            animation: shimmer 3s infinite;
-        }
-
-        .form-title {
-            font-size: 2.5em;
-            color: #c41e3a;
-            margin-bottom: 15px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .form-subtitle {
-            font-size: 1.2em;
-            color: #555;
-            margin-bottom: 40px;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 30px;
-            position: relative;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 1.1em;
-            color: #333;
-            margin-bottom: 10px;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 18px;
-            font-size: 1.1em;
-            border: 3px solid #ddd;
-            border-radius: 15px;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #ff4500;
-            box-shadow: 0 0 20px rgba(255, 69, 0, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .form-group input:focus + label {
-            color: #ff4500;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 20px;
-            font-size: 1.3em;
-            font-weight: bold;
-            color: white;
-            background: linear-gradient(135deg, #c41e3a 0%, #ff4500 100%);
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(196, 30, 58, 0.4);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(196, 30, 58, 0.6);
-        }
-
-        .submit-btn:active {
-            transform: translateY(-1px);
-        }
-
-        .success-message {
-            display: none;
-            background: linear-gradient(135deg, #00c851 0%, #007e33 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            font-size: 1.2em;
-            margin-top: 20px;
-            animation: fadeInUp 0.5s ease-out;
-        }
-
-        .success-message.show {
-            display: block;
-        }
-
-        .particle {
-            position: fixed;
-            pointer-events: none;
-            animation: particleFloat 3s ease-out forwards;
-        }
-
-        @keyframes particleFloat {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 1;
+        /* Mobile Responsive */
+        @media (max-width: 1200px) {
+            .logo-header {
+                height: 130px;
             }
-            100% {
-                transform: translate(var(--tx), var(--ty)) scale(0);
-                opacity: 0;
+            
+            .footer-logo-img {
+                height: 90px;
             }
         }
 
-        .info-box {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 30px;
-            margin: 30px auto;
-            max-width: 800px;
-            color: white;
-            animation: fadeInUp 1s ease-out 0.9s backwards;
-        }
+        @media (max-width: 992px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 60px;
+            }
 
-        .info-box h3 {
-            font-size: 1.8em;
-            margin-bottom: 15px;
-            color: #ffcc00;
-        }
-
-        .info-box p {
-            font-size: 1.2em;
-            line-height: 1.6;
-            margin-bottom: 10px;
+            .event-info {
+                text-align: center;
+            }
+            
+            .event-date, .event-location {
+                justify-content: center;
+            }
+            
+            .logo-header {
+                height: 110px;
+            }
         }
 
         @media (max-width: 768px) {
-            .form-section {
-                padding: 30px 20px;
+            .logo-header {
+                height: 90px;
+            }
+            
+            .header-text h1 {
+                font-size: 2rem;
+            }
+            
+            .header-text p {
+                font-size: 1.1rem;
+            }
+            
+            .event-banner {
+                max-width: 100%;
+                border-radius: 0;
+                margin-bottom: -20px;
             }
 
+            .speakers-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 40px;
+            }
+
+            .footer-logo-container {
+                align-items: center;
+            }
+
+            .footer-contact {
+                text-align: center;
+            }
+
+            .footer-contact p {
+                justify-content: center;
+            }
+
+            .presenca-form {
+                padding: 40px 25px;
+            }
+
+            .success-message {
+                padding: 50px 30px;
+                width: 90%;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+
+            .partner-logo {
+                height: 60px;
+            }
+
+            .partners-logos {
+                gap: 40px;
+            }
+            
+            .footer-logo-img {
+                height: 80px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .logo-header {
+                height: 70px;
+            }
+            
+            .header-text h1 {
+                font-size: 1.7rem;
+            }
+            
+            .header-text p {
+                font-size: 1rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .speakers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-card {
+                padding: 50px 30px;
+            }
+
+            .event-date {
+                font-size: 1.7rem;
+            }
+
+            .event-location {
+                font-size: 1.4rem;
+            }
+            
+            .footer-logo-img {
+                height: 70px;
+            }
+            
+            .footer-logo-text {
+                font-size: 1.5rem;
+            }
+            
             .form-title {
-                font-size: 2em;
-            }
-
-            .logo {
-                max-width: 300px;
-            }
-
-            .info-box {
-                padding: 20px;
+                font-size: 1.8rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="geometric-bg">
-        <div class="geometric-shape shape1"></div>
-        <div class="geometric-shape shape2"></div>
-        <div class="geometric-shape shape3"></div>
-    </div>
-
-    <div class="container">
-        <div class="header">
-            <div class="logo-container">
-                <img src="logo.png" alt="Logo Aprenda & Empreenda" class="logo">
+    <!-- Header with Large Logo -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-header-container">
+                    <img src="logo1.png" alt="Aprenda & Empreenda" style="height: 200px;">
+                </div>
+                <div class="event-banner">
+                    <img src="event.jpeg" alt="Evento Aprenda & Empreenda" class="event-banner-img">
+                </div>
             </div>
         </div>
+    </header>
 
-        <img src="event.jpeg" alt="Conferência Aprenda & Empreenda" class="event-image" id="eventImage">
-
-        <div class="info-box">
-            <h3>📅 20 de Dezembro | ⏰ 8H</h3>
-            <p>📍 Sala de Conferência do Shopping Popular (CAMAMA)</p>
-            <p>✨ Construindo Negócios. Impulsionando Líderes</p>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="event-info">
+                    <div class="event-date">
+                        <i class="far fa-calendar-alt"></i> 20 de Dezembro | 8h00
+                    </div>
+                    <div class="event-location">
+                        <i class="fas fa-map-marker-alt"></i> Sala de Conferência do Shopping Popular (Camama)
+                    </div>
+                    <p class="event-description">
+                        Participe do evento de empreendedorismo e aprendizagem que vai transformar sua visão de negócios. Conecte-se com especialistas, aprenda novas habilidades e expanda sua rede de contactos.
+                    </p>
+                    <div class="contact-info">
+                        <p><i class="fas fa-phone"></i> Para mais informações: <strong>942 218 877</strong> | <strong>953 990 348</strong></p>
+                    </div>
+                </div>
+                <div class="presenca-form">
+                    <h2 class="form-title">Marcar Presença</h2>
+                    <form id="attendanceForm">
+                        <div class="form-group">
+                            <label for="name">Nome Completo</label>
+                            <input type="text" id="name" class="form-control" placeholder="Digite seu nome completo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Número de Telefone</label>
+                            <input type="tel" id="phone" class="form-control" placeholder="Digite seu número de telefone" required>
+                        </div>
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-check-circle"></i> Confirmar Presença
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <div class="form-section">
-            <h2 class="form-title">Marcar Presença</h2>
-            <p class="form-subtitle">Confirme sua participação no evento!</p>
-            
-            <form id="presenceForm">
-                <div class="form-group">
-                    <label for="name">Nome Completo</label>
-                    <input type="text" id="name" name="name" required placeholder="Digite seu nome">
-                </div>
-
-                <div class="form-group">
-                    <label for="phone">Número de Telefone</label>
-                    <input type="tel" id="phone" name="phone" required placeholder="+244 900 000 000">
-                </div>
-
-                <button type="submit" class="submit-btn">Confirmar Presença</button>
-
-                <div class="success-message" id="successMessage">
-                    ✓ Presença confirmada com sucesso! Até breve!
-                </div>
-            </form>
+    <!-- Speakers Section -->
+    <section class="speakers">
+        <div class="container">
+            <h2 class="section-title">Palestrantes & Organizadores</h2>
+            <div class="speakers-grid">
+                <!-- Speakers will be populated by JavaScript -->
+            </div>
         </div>
+    </section>
+
+    <!-- Event Details -->
+    <section class="details">
+        <div class="container">
+            <h2 class="section-title">Detalhes do Evento</h2>
+            <div class="details-grid">
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3 class="detail-title">Localização</h3>
+                    <p class="detail-text">Sala de Conferência do Shopping Popular (Camama)</p>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3 class="detail-title">Data & Hora</h3>
+                    <p class="detail-text">20 de Dezembro de 2023, às 8h00</p>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h3 class="detail-title">Informações</h3>
+                    <p class="detail-text">Evento gratuito com foco em empreendedorismo e desenvolvimento de habilidades</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners -->
+    <section class="partners">
+        <div class="container">
+            <h2 class="section-title">Apoio Institucional</h2>
+            <div class="partners-logos">
+                <img src="https://via.placeholder.com/180x70/000000/B22222?text=H%26S" alt="H&S" class="partner-logo">
+                <img src="https://via.placeholder.com/180x70/000000/B22222?text=Movento" alt="Movento" class="partner-logo">
+                <img src="https://via.placeholder.com/180x70/000000/B22222?text=CCIAM" alt="CCIAM" class="partner-logo">
+                <img src="https://via.placeholder.com/180x70/000000/B22222?text=Maravilha" alt="Maravilha Rio" class="partner-logo">
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo-container">
+                    <img src="logo1.png" alt="Aprenda & Empreenda" class="footer-logo-img">
+                    <div class="footer-logo-text">
+                        APRENDA & <span>EMPRENDA</span>
+                    </div>
+                </div>
+                <div class="footer-contact">
+                    <p><i class="fas fa-phone"></i> 942 218 877 | 953 990 348</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Sala de Conferência do Shopping Popular (Camama)</p>
+                    <p><i class="far fa-calendar-alt"></i> 20 de Dezembro de 2023, 8h00</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 Aprenda & Empreenda. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Message -->
+    <div class="overlay" id="overlay"></div>
+    <div class="success-message" id="successMessage">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>Presença Confirmada!</h2>
+        <p>Obrigado por confirmar sua presença no evento <strong>Aprenda & Empreenda</strong>.</p>
+        <p>Entraremos em contacto através do número fornecido com mais detalhes sobre o evento.</p>
+        <button class="btn-submit" id="closeSuccess" style="margin-top: 30px; width: auto; padding: 15px 40px;">Fechar</button>
     </div>
 
     <script>
-        // Particle effect on click
-        document.addEventListener('click', function(e) {
-            for (let i = 0; i < 8; i++) {
-                createParticle(e.clientX, e.clientY);
-            }
+        // Speakers data from the image
+        const speakers = [
+            { name: "HELIO SANTANA", role: "Palestrante" },
+            { name: "MARIA TERESA", role: "Palestrante" },
+            { name: "NIUKA CASIMIRO", role: "Palestrante" },
+            { name: "CATARINA ANTONIO", role: "Palestrante" },
+            { name: "DAVID MOMA", role: "Palestrante" },
+            { name: "ÁDER MIRANDA", role: "Palestrante" },
+            { name: "ROMEU MAIATO", role: "Palestrante" },
+            { name: "MARIA PONGUE", role: "Organizadora" },
+            { name: "THE TÓRIO", role: "Organizador" },
+            { name: "MUANZA EMANUEL", role: "Organizador" },
+            { name: "JAIME BEIRÃO", role: "Organizador" },
+            { name: "MAURO MUNANA", role: "Organizador" },
+            { name: "GILBERTO CIPRIANO", role: "Organizador" },
+            { name: "LISANDRA ESPERANÇA", role: "Decoração" }
+        ];
+
+        // Populate speakers grid
+        const speakersGrid = document.querySelector('.speakers-grid');
+        speakers.forEach(speaker => {
+            const speakerCard = document.createElement('div');
+            speakerCard.className = 'speaker-card';
+            speakerCard.innerHTML = `
+                <h3 class="speaker-name">${speaker.name}</h3>
+                <p class="speaker-role">${speaker.role}</p>
+            `;
+            speakersGrid.appendChild(speakerCard);
         });
 
-        function createParticle(x, y) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            particle.style.left = x + 'px';
-            particle.style.top = y + 'px';
-            particle.style.width = Math.random() * 10 + 5 + 'px';
-            particle.style.height = particle.style.width;
-            particle.style.background = `hsl(${Math.random() * 60 + 340}, 100%, 50%)`;
-            particle.style.borderRadius = '50%';
-            
-            const tx = (Math.random() - 0.5) * 200;
-            const ty = (Math.random() - 0.5) * 200;
-            particle.style.setProperty('--tx', tx + 'px');
-            particle.style.setProperty('--ty', ty + 'px');
-            
-            document.body.appendChild(particle);
-            
-            setTimeout(() => particle.remove(), 3000);
-        }
-
         // Form submission
-        const form = document.getElementById('presenceForm');
+        const attendanceForm = document.getElementById('attendanceForm');
         const successMessage = document.getElementById('successMessage');
+        const overlay = document.getElementById('overlay');
+        const closeSuccess = document.getElementById('closeSuccess');
 
-        form.addEventListener('submit', function(e) {
+        attendanceForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
             const name = document.getElementById('name').value;
             const phone = document.getElementById('phone').value;
-
-            // Store data (in memory for this demo)
-            const data = { name, phone, timestamp: new Date().toISOString() };
-            console.log('Presença confirmada:', data);
-
-            // Show success message
-            successMessage.classList.add('show');
-            form.reset();
-
-            // Create celebration particles
-            for (let i = 0; i < 30; i++) {
-                setTimeout(() => {
-                    createParticle(
-                        window.innerWidth / 2 + (Math.random() - 0.5) * 200,
-                        window.innerHeight / 2 + (Math.random() - 0.5) * 200
-                    );
-                }, i * 50);
+            
+            // Simple validation
+            if (name.length < 3) {
+                alert("Por favor, insira um nome válido (mínimo 3 caracteres).");
+                return;
             }
-
-            // Hide success message after 5 seconds
-            setTimeout(() => {
-                successMessage.classList.remove('show');
-            }, 5000);
+            
+            if (phone.length < 9) {
+                alert("Por favor, insira um número de telefone válido.");
+                return;
+            }
+            
+            // In a real application, you would send this data to a server
+            console.log('Presença marcada:', { name, phone });
+            
+            // Show success message
+            successMessage.classList.add('active');
+            overlay.classList.add('active');
+            
+            // Reset form
+            attendanceForm.reset();
         });
 
-        // Input animation
-        const inputs = document.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.style.transform = 'scale(1.02)';
+        // Close success message
+        closeSuccess.addEventListener('click', function() {
+            successMessage.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        overlay.addEventListener('click', function() {
+            successMessage.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    entry.target.classList.add('animated');
+                }
             });
-            
-            input.addEventListener('blur', function() {
-                this.parentElement.style.transform = 'scale(1)';
-            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        document.querySelectorAll('.speaker-card, .detail-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Handle image loading errors (fallback to placeholder)
+        const headerLogo = document.querySelector('.logo-header');
+        const footerLogo = document.querySelector('.footer-logo-img');
+        const eventBanner = document.querySelector('.event-banner-img');
+        
+        headerLogo.addEventListener('error', function() {
+            this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150"><rect width="300" height="150" fill="black"/><text x="150" y="60" font-family="Arial" font-size="32" fill="white" text-anchor="middle" dy=".3em">APRENDA &</text><text x="150" y="100" font-family="Arial" font-size="32" fill="%23B22222" text-anchor="middle" dy=".3em">EMPRENDA</text></svg>';
+        });
+        
+        footerLogo.addEventListener('error', function() {
+            this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100"><rect width="200" height="100" fill="black"/><text x="100" y="40" font-family="Arial" font-size="24" fill="white" text-anchor="middle" dy=".3em">APRENDA &</text><text x="100" y="70" font-family="Arial" font-size="24" fill="%23B22222" text-anchor="middle" dy=".3em">EMPRENDA</text></svg>';
+        });
+
+        eventBanner.addEventListener('error', function() {
+            this.src = 'https://via.placeholder.com/1000x500/000000/B22222?text=Evento+Aprenda+%26+Empreenda+20+Dez+8h';
         });
     </script>
 </body>
