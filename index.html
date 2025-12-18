@@ -1050,6 +1050,98 @@
                 font-size: 1.8rem;
             }
         }
+
+        /* Add to your existing CSS */
+.error-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: var(--dark);
+    padding: 70px 50px;
+    border-radius: 25px;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.95), 0 0 0 2px #dc3545;
+    text-align: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid #dc3545;
+    max-width: 90%;
+    width: 600px;
+    backdrop-filter: blur(15px);
+}
+
+.error-message.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.error-icon {
+    font-size: 6rem;
+    color: #dc3545;
+    margin-bottom: 30px;
+    animation: errorPulse 2s ease infinite;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.6s ease;
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.loading-spinner {
+    text-align: center;
+    color: var(--text);
+}
+
+.spinner {
+    width: 70px;
+    height: 70px;
+    border: 5px solid rgba(255, 255, 255, 0.1);
+    border-top: 5px solid var(--secondary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+.loading-spinner p {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes errorPulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 15px rgba(220, 53, 69, 0.8));
+    }
+    50% {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 35px rgba(220, 53, 69, 1));
+    }
+}
     </style>
 </head>
 <body>
@@ -1108,7 +1200,7 @@
     <!-- Speakers Section -->
     <section class="speakers">
         <div class="container">
-            <h2 class="section-title">Palestrantes & Organizadores</h2>
+            <h2 class="section-title">Palestrantes & Oradores</h2>
             <div class="speakers-grid">
                 <!-- Speakers will be populated by JavaScript -->
             </div>
@@ -1181,129 +1273,211 @@
     </footer>
 
     <!-- Success Message -->
-    <div class="overlay" id="overlay"></div>
-    <div class="success-message" id="successMessage">
-        <div class="success-icon">
-            <i class="fas fa-check-circle"></i>
-        </div>
-        <h2>Presença Confirmada!</h2>
-        <p>Obrigado por confirmar sua presença no evento <strong>Aprenda & Empreenda</strong>.</p>
-        <p>Entraremos em contacto através do número fornecido com mais detalhes sobre o evento.</p>
-        <button class="btn-submit" id="closeSuccess" style="margin-top: 30px; width: auto; padding: 15px 40px;">Fechar</button>
+<!-- Replace the success message section with this: -->
+<div class="overlay" id="overlay"></div>
+<div class="success-message" id="successMessage">
+    <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
     </div>
+    <h2 id="successTitle">Presença Confirmada!</h2>
+    <p id="successText">Obrigado por confirmar sua presença no evento <strong>Aprenda & Empreenda</strong>.</p>
+    <p>Entraremos em contacto através do número fornecido com mais detalhes sobre o evento.</p>
+    <button class="btn-submit" id="closeSuccess" style="margin-top: 30px; width: auto; padding: 15px 40px;">Fechar</button>
+</div>
 
-    <script>
-        // Speakers data from the image
-        const speakers = [
-            { name: "HELIO SANTANA", role: "Palestrante" },
-            { name: "MARIA TERESA", role: "Palestrante" },
-            { name: "NIUKA CASIMIRO", role: "Palestrante" },
-            { name: "CATARINA ANTONIO", role: "Palestrante" },
-            { name: "DAVID MOMA", role: "Palestrante" },
-            { name: "ÁDER MIRANDA", role: "Palestrante" },
-            { name: "ROMEU MAIATO", role: "Palestrante" },
-            { name: "MARIA PONGUE", role: "Organizadora" },
-            { name: "THE TÓRIO", role: "Organizador" },
-            { name: "MUANZA EMANUEL", role: "Organizador" },
-            { name: "JAIME BEIRÃO", role: "Organizador" },
-            { name: "MAURO MUNANA", role: "Organizador" },
-            { name: "GILBERTO CIPRIANO", role: "Organizador" },
-            { name: "LISANDRA ESPERANÇA", role: "Decoração" }
-        ];
+<div class="error-message" id="errorMessage">
+    <div class="error-icon">
+        <i class="fas fa-exclamation-circle"></i>
+    </div>
+    <h2 id="errorTitle">Erro</h2>
+    <p id="errorText">Ocorreu um erro ao processar a sua inscrição.</p>
+    <button class="btn-submit" id="closeError" style="margin-top: 30px; width: auto; padding: 15px 40px; background: var(--dark);">Fechar</button>
+</div>
 
-        // Populate speakers grid
-        const speakersGrid = document.querySelector('.speakers-grid');
-        speakers.forEach(speaker => {
-            const speakerCard = document.createElement('div');
-            speakerCard.className = 'speaker-card';
-            speakerCard.innerHTML = `
-                <h3 class="speaker-name">${speaker.name}</h3>
-                <p class="speaker-role">${speaker.role}</p>
-            `;
-            speakersGrid.appendChild(speakerCard);
-        });
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Processando inscrição...</p>
+    </div>
+</div>
 
-        // Form submission
-        const attendanceForm = document.getElementById('attendanceForm');
-        const successMessage = document.getElementById('successMessage');
-        const overlay = document.getElementById('overlay');
-        const closeSuccess = document.getElementById('closeSuccess');
+   <script>
+    // Your API endpoint - Update this with your actual API URL
+    const API_URL = 'https://hs-node-api.vercel.app/api'; // Change this to your actual API URL
+    
+    // Speakers data from the image
+    const speakers = [
+        { name: "HELIO SANTANA", role: "Palestrante" },
+        { name: "MARIA TERESA", role: "Palestrante" },
+        { name: "NIUKA CASIMIRO", role: "Palestrante" },
+        { name: "CATARINA ANTONIO", role: "Palestrante" },
+        { name: "DAVID MOMA", role: "Palestrante" },
+        { name: "ÁDER MIRANDA", role: "Palestrante" },
+        { name: "ROMEU MAIATO", role: "Palestrante" },
+        { name: "MARIA PONGUE", role: "Organizadora" },
+        { name: "THE TÓRIO", role: "Organizador" },
+        { name: "MUANZA EMANUEL", role: "Organizador" },
+        { name: "JAIME BEIRÃO", role: "Organizador" },
+        { name: "MAURO MUNANA", role: "Organizador" },
+        { name: "GILBERTO CIPRIANO", role: "Organizador" },
+        { name: "LISANDRA ESPERANÇA", role: "Decoração" }
+    ];
 
-        attendanceForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-            
-            // Simple validation
-            if (name.length < 3) {
-                alert("Por favor, insira um nome válido (mínimo 3 caracteres).");
-                return;
-            }
-            
-            if (phone.length < 9) {
-                alert("Por favor, insira um número de telefone válido.");
-                return;
-            }
-            
-            // In a real application, you would send this data to a server
-            console.log('Presença marcada:', { name, phone });
-            
-            // Show success message
-            successMessage.classList.add('active');
-            overlay.classList.add('active');
-            
-            // Reset form
-            attendanceForm.reset();
-        });
+    // Populate speakers grid
+    const speakersGrid = document.querySelector('.speakers-grid');
+    speakers.forEach(speaker => {
+        const speakerCard = document.createElement('div');
+        speakerCard.className = 'speaker-card';
+        speakerCard.innerHTML = `
+            <h3 class="speaker-name">${speaker.name}</h3>
+            <p class="speaker-role">${speaker.role}</p>
+        `;
+        speakersGrid.appendChild(speakerCard);
+    });
 
-        // Close success message
-        closeSuccess.addEventListener('click', function() {
-            successMessage.classList.remove('active');
-            overlay.classList.remove('active');
-        });
+    // Form submission with AJAX
+    const attendanceForm = document.getElementById('attendanceForm');
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    const overlay = document.getElementById('overlay');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const closeSuccess = document.getElementById('closeSuccess');
+    const closeError = document.getElementById('closeError');
+    const successTitle = document.getElementById('successTitle');
+    const successText = document.getElementById('successText');
+    const errorTitle = document.getElementById('errorTitle');
+    const errorText = document.getElementById('errorText');
 
-        overlay.addEventListener('click', function() {
-            successMessage.classList.remove('active');
-            overlay.classList.remove('active');
-        });
-
-        // Add animation on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animationPlayState = 'running';
-                    entry.target.classList.add('animated');
-                }
+    attendanceForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        
+        // Simple client-side validation
+        if (name.length < 3) {
+            showError('Erro de Validação', 'Por favor, insira um nome válido (mínimo 3 caracteres).');
+            return;
+        }
+        
+        if (phone.length < 9) {
+            showError('Erro de Validação', 'Por favor, insira um número de telefone válido (mínimo 9 dígitos).');
+            return;
+        }
+        
+        // Show loading overlay
+        loadingOverlay.classList.add('active');
+        
+        try {
+            // Send data to API
+            const response = await fetch(`${API_URL}/attendance`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name,
+                    phone: phone
+                })
             });
-        }, observerOptions);
+            
+            const result = await response.json();
+            
+            // Hide loading overlay
+            loadingOverlay.classList.remove('active');
+            
+            if (response.ok && result.success) {
+                // Success - show success message
+                showSuccess('Presença Confirmada!', result.message || 'Obrigado por confirmar sua presença no evento!');
+                
+                // Reset form
+                attendanceForm.reset();
+                
+                // Log to console for debugging
+                console.log('Presença registada com sucesso:', result.data);
+            } else {
+                // Error from API
+                showError('Erro na Inscrição', result.message || 'Ocorreu um erro ao processar a sua inscrição.');
+            }
+            
+        } catch (error) {
+            // Network or other error
+            loadingOverlay.classList.remove('active');
+            console.error('Erro na submissão:', error);
+            showError('Erro de Conexão', 'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
+        }
+    });
 
-        // Observe elements for animation
-        document.querySelectorAll('.speaker-card, .detail-card').forEach(el => {
-            observer.observe(el);
-        });
+    // Show success message
+    function showSuccess(title, message) {
+        successTitle.textContent = title;
+        successText.textContent = message;
+        successMessage.classList.add('active');
+        overlay.classList.add('active');
+    }
 
-        // Handle image loading errors (fallback to placeholder)
-        const headerLogo = document.querySelector('.logo-header');
-        const footerLogo = document.querySelector('.footer-logo-img');
-        const eventBanner = document.querySelector('.event-banner-img');
-        
-        headerLogo.addEventListener('error', function() {
-            this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150"><rect width="300" height="150" fill="black"/><text x="150" y="60" font-family="Arial" font-size="32" fill="white" text-anchor="middle" dy=".3em">APRENDA &</text><text x="150" y="100" font-family="Arial" font-size="32" fill="%23B22222" text-anchor="middle" dy=".3em">EMPRENDA</text></svg>';
-        });
-        
-        footerLogo.addEventListener('error', function() {
-            this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100"><rect width="200" height="100" fill="black"/><text x="100" y="40" font-family="Arial" font-size="24" fill="white" text-anchor="middle" dy=".3em">APRENDA &</text><text x="100" y="70" font-family="Arial" font-size="24" fill="%23B22222" text-anchor="middle" dy=".3em">EMPRENDA</text></svg>';
-        });
+    // Show error message
+    function showError(title, message) {
+        errorTitle.textContent = title;
+        errorText.textContent = message;
+        errorMessage.classList.add('active');
+        overlay.classList.add('active');
+    }
 
-        eventBanner.addEventListener('error', function() {
-            this.src = 'https://via.placeholder.com/1000x500/000000/B22222?text=Evento+Aprenda+%26+Empreenda+20+Dez+8h';
+    // Close success message
+    closeSuccess.addEventListener('click', function() {
+        successMessage.classList.remove('active');
+        overlay.classList.remove('active');
+    });
+
+    // Close error message
+    closeError.addEventListener('click', function() {
+        errorMessage.classList.remove('active');
+        overlay.classList.remove('active');
+    });
+
+    overlay.addEventListener('click', function() {
+        successMessage.classList.remove('active');
+        errorMessage.classList.remove('active');
+        overlay.classList.remove('active');
+    });
+
+    // Add animation on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+                entry.target.classList.add('animated');
+            }
         });
-    </script>
+    }, observerOptions);
+
+    // Observe elements for animation
+    document.querySelectorAll('.speaker-card, .detail-card').forEach(el => {
+        observer.observe(el);
+    });
+
+    // Handle image loading errors (fallback to placeholder)
+    const headerLogo = document.querySelector('.logo-header');
+    const footerLogo = document.querySelector('.footer-logo-img');
+    const eventBanner = document.querySelector('.event-banner-img');
+    
+    headerLogo.addEventListener('error', function() {
+        this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150"><rect width="300" height="150" fill="black"/><text x="150" y="60" font-family="Arial" font-size="32" fill="white" text-anchor="middle" dy=".3em">APRENDA &</text><text x="150" y="100" font-family="Arial" font-size="32" fill="%23B22222" text-anchor="middle" dy=".3em">EMPRENDA</text></svg>';
+    });
+    
+    footerLogo.addEventListener('error', function() {
+        this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100"><rect width="200" height="100" fill="black"/><text x="100" y="40" font-family="Arial" font-size="24" fill="white" text-anchor="middle" dy=".3em">APRENDA &</text><text x="100" y="70" font-family="Arial" font-size="24" fill="%23B22222" text-anchor="middle" dy=".3em">EMPRENDA</text></svg>';
+    });
+
+    eventBanner.addEventListener('error', function() {
+        this.src = 'https://via.placeholder.com/1000x500/000000/B22222?text=Evento+Aprenda+%26+Empreenda+20+Dez+8h';
+    });
+</script>
 </body>
 </html>
