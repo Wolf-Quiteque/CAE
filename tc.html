@@ -717,6 +717,10 @@
                     <h1 class="admin-title">Admin <span>Dashboard</span></h1>
                 </div>
                 <div class="admin-actions">
+                    <!-- Add this to your admin.html in the admin-actions div -->
+<button class="btn-admin secondary" onclick="testConnection()">
+    <i class="fas fa-bug"></i> Testar Conexão
+</button>
                     <button class="btn-admin secondary" onclick="refreshData()">
                         <i class="fas fa-sync-alt"></i> Atualizar
                     </button>
@@ -887,181 +891,757 @@
             </div>
         </div>
     </div>
-    
     <script>
-        // ---- Public Admin Routes (no authentication needed for viewing)
-app.get('/api/attendance/public', async (req, res) => {
-    try {
-        await ensureMongo();
-        const {
-            event = 'Aprenda & Empreenda',
-                page = 1,
-                limit = 10,
-                search = '',
-                filter = 'all',
-                sortBy = 'date',
-                sortOrder = 'desc'
-        } = req.query;
-        
-        // Build query
-        const query = { event };
-        
-        // Apply search filter
-        if (search && search.trim() !== '') {
-            const searchRegex = new RegExp(search.trim(), 'i');
-            query.$or = [
-                { name: searchRegex },
-                { phone: { $regex: search.trim() } }
-            ];
-        }
-        
-        // Apply SMS filter
-        if (filter === 'sms-sent') {
-            query.smsSent = true;
-        } else if (filter === 'sms-not-sent') {
-            query.smsSent = false;
-        }
-        
-        // Calculate pagination
-        const pageNum = Math.max(1, parseInt(page));
-        const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
-        const skip = (pageNum - 1) * limitNum;
-        
-        // Build sort
-        const sort = {};
-        sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
-        
-        // Get total count
-        const total = await Attendance.countDocuments(query);
-        
-        // Get data with pagination
-        const data = await Attendance.find(query)
-            .sort(sort)
-            .skip(skip)
-            .limit(limitNum)
-            .lean();
-        
-        // Calculate statistics
-        const totalCount = await Attendance.countDocuments({ event });
-        const smsSentCount = await Attendance.countDocuments({ event, smsSent: true });
-        
-        // Today's date at start of day
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        
-        const todayCount = await Attendance.countDocuments({
-            event,
-            date: { $gte: today, $lt: tomorrow }
-        });
-        
-        // This week's registrations
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-        
-        const weekCount = await Attendance.countDocuments({
-            event,
-            date: { $gte: oneWeekAgo }
-        });
-        
-        // Last week for comparison
-        const twoWeeksAgo = new Date();
-        twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-        
-        const lastWeekCount = await Attendance.countDocuments({
-            event,
-            date: { $gte: twoWeeksAgo, $lt: oneWeekAgo }
-        });
-        
-        // Yesterday's registrations
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        
-        const yesterdayCount = await Attendance.countDocuments({
-            event,
-            date: { $gte: yesterday, $lt: today }
-        });
-        
-        // Calculate percentages for changes
-        const weekChange = lastWeekCount > 0 ?
-            Math.round(((weekCount - lastWeekCount) / lastWeekCount) * 100) :
-            (weekCount > 0 ? 100 : 0);
-        
-        const todayChange = yesterdayCount > 0 ?
-            Math.round(((todayCount - yesterdayCount) / yesterdayCount) * 100) :
-            (todayCount > 0 ? 100 : 0);
-        
-        // SMS sent today
-        const smsTodayCount = await Attendance.countDocuments({
-            event,
-            smsSentAt: { $gte: today, $lt: tomorrow }
-        });
-        
-        res.json({
-            success: true,
-            data,
-            pagination: {
-                page: pageNum,
-                limit: limitNum,
-                total,
-                totalPages: Math.ceil(total / limitNum)
-            },
-            statistics: {
-                total: totalCount,
-                smsSent: smsSentCount,
-                today: todayCount,
-                week: weekCount,
-                weekChange,
-                todayChange,
-                smsToday: smsTodayCount
+    // Configuration
+    const API_URL = 'https://hs-node-api.vercel.app/api';
+    
+    // Global state
+    let attendees = [];
+    let currentPage = 1;
+    let itemsPerPage = 10;
+    let currentFilter = 'all';
+    let searchQuery = '';
+    let sortField = 'date';
+    let sortDirection = 'desc';
+    let statistics = {};
+    let paginationInfo = {};
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('Admin dashboard initialized');
+        loadAttendees();
+        // Refresh data every 30 seconds
+        setInterval(refreshData, 30000);
+    });
+    
+    // Load attendees data
+    async function loadAttendees() {
+        try {
+            showLoadingState(true);
+            
+            // Build query parameters
+            const params = new URLSearchParams({
+                page: currentPage,
+                limit: itemsPerPage,
+                search: searchQuery,
+                filter: currentFilter,
+                sortBy: sortField,
+                sortOrder: sortDirection
+            });
+            
+            const apiUrl = `${API_URL}/attendance/public?${params}`;
+            console.log('Fetching from:', apiUrl);
+            
+            const response = await fetch(apiUrl, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        });
-        
-    } catch (e) {
-        console.error('[GET /api/attendance/public] error', e);
-        res.status(500).json({
-            success: false,
-            message: 'Erro ao obter lista de participantes'
-        });
+            
+            const data = await response.json();
+            console.log('API Response:', data);
+            
+            if (data.success) {
+                attendees = data.data || [];
+                statistics = data.statistics || {};
+                paginationInfo = data.pagination || {};
+                
+                console.log('Loaded attendees:', attendees.length);
+                console.log('Statistics:', statistics);
+                
+                // Check for debug info
+                if (data.debug) {
+                    console.log('Debug info:', data.debug);
+                    if (attendees.length === 0 && data.debug.allEvents) {
+                        console.log('Available events:', data.debug.allEvents);
+                    }
+                }
+                
+                updateStatistics();
+                renderTable();
+                updatePagination();
+                showLoadingState(false);
+                
+                // Show notification if no data
+                if (attendees.length === 0 && !searchQuery) {
+                    showNotification('Nenhuma inscrição encontrada no banco de dados.', 'warning');
+                }
+            } else {
+                showError('Erro ao carregar dados: ' + (data.message || 'Erro desconhecido'));
+                showLoadingState(false);
+            }
+        } catch (error) {
+            console.error('Error loading attendees:', error);
+            showError('Erro de conexão. Tente novamente. Detalhes no console.');
+            showLoadingState(false);
+        }
     }
-});
-
-// Delete attendance (public but with basic validation)
-app.delete('/api/attendance/public/:id', async (req, res) => {
-    try {
-        await ensureMongo();
+    
+    // Show/hide loading state
+    function showLoadingState(loading) {
+        const tbody = document.getElementById('attendeesTableBody');
+        if (loading) {
+            tbody.innerHTML = `
+                <tr id="loadingRow">
+                    <td colspan="6" class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Carregando inscrições...</p>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+    
+    // Update statistics
+    function updateStatistics() {
+        // Format numbers with Portuguese locale
+        const formatNumber = (num) => {
+            if (num === undefined || num === null) return '0';
+            return num.toLocaleString('pt-PT');
+        };
         
-        const attendanceId = req.params.id;
+        document.getElementById('totalCount').textContent = formatNumber(statistics.total);
+        document.getElementById('smsCount').textContent = formatNumber(statistics.smsSent);
+        document.getElementById('todayCount').textContent = formatNumber(statistics.today);
+        document.getElementById('weekCount').textContent = formatNumber(statistics.week);
         
-        // You might want to add some validation here, like checking a simple token
-        // For now, we'll allow deletion but you should implement proper security
-        const deleted = await Attendance.findByIdAndDelete(attendanceId);
+        // Update changes with icons
+        const totalChangeEl = document.getElementById('totalChange');
+        const smsChangeEl = document.getElementById('smsChange');
+        const todayChangeEl = document.getElementById('todayChange');
+        const weekChangeEl = document.getElementById('weekChange');
         
-        if (!deleted) {
-            return res.status(404).json({
-                success: false,
-                message: 'Registro não encontrado'
+        // Total change
+        if (statistics.total > 0) {
+            totalChangeEl.innerHTML = `<i class="fas fa-users"></i> ${formatNumber(statistics.total)} inscrições`;
+            totalChangeEl.className = 'stat-change positive';
+        } else {
+            totalChangeEl.innerHTML = `<i class="fas fa-info-circle"></i> Nenhuma inscrição`;
+            totalChangeEl.className = 'stat-change';
+        }
+        
+        // SMS change
+        if (statistics.smsToday > 0) {
+            smsChangeEl.innerHTML = `<i class="fas fa-sms"></i> ${formatNumber(statistics.smsToday)} hoje`;
+            smsChangeEl.className = 'stat-change positive';
+        } else {
+            smsChangeEl.innerHTML = `<i class="fas fa-clock"></i> Aguardando envios`;
+            smsChangeEl.className = 'stat-change';
+        }
+        
+        // Today change
+        if (statistics.todayChange !== undefined) {
+            if (statistics.todayChange >= 0) {
+                todayChangeEl.innerHTML = `<i class="fas fa-arrow-up"></i> ${Math.abs(statistics.todayChange)}% vs ontem`;
+                todayChangeEl.className = 'stat-change positive';
+            } else {
+                todayChangeEl.innerHTML = `<i class="fas fa-arrow-down"></i> ${Math.abs(statistics.todayChange)}% vs ontem`;
+                todayChangeEl.className = 'stat-change negative';
+            }
+        }
+        
+        // Week change
+        if (statistics.weekChange !== undefined) {
+            if (statistics.weekChange >= 0) {
+                weekChangeEl.innerHTML = `<i class="fas fa-arrow-up"></i> ${Math.abs(statistics.weekChange)}% vs semana passada`;
+                weekChangeEl.className = 'stat-change positive';
+            } else {
+                weekChangeEl.innerHTML = `<i class="fas fa-arrow-down"></i> ${Math.abs(statistics.weekChange)}% vs semana passada`;
+                weekChangeEl.className = 'stat-change negative';
+            }
+        }
+    }
+    
+    // Render table
+    function renderTable() {
+        const tbody = document.getElementById('attendeesTableBody');
+        
+        // Clear table
+        tbody.innerHTML = '';
+        
+        if (attendees.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td colspan="6" class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <p>${searchQuery ? 'Nenhum resultado encontrado' : 'Nenhuma inscrição encontrada'}</p>
+                    ${searchQuery ? '<button class="btn-admin secondary" onclick="clearSearch()" style="margin-top: 15px;">Limpar Pesquisa</button>' : ''}
+                </td>
+            `;
+            tbody.appendChild(row);
+        } else {
+            // Add rows
+            attendees.forEach((attendee, index) => {
+                const row = document.createElement('tr');
+                const date = attendee.date ? new Date(attendee.date) : new Date();
+                const formattedDate = date.toLocaleDateString('pt-PT', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                const formattedTime = date.toLocaleTimeString('pt-PT', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                // Format SMS sent date if exists
+                let smsSentDate = '';
+                let smsSentTime = '';
+                if (attendee.smsSentAt) {
+                    const smsDate = new Date(attendee.smsSentAt);
+                    smsSentDate = smsDate.toLocaleDateString('pt-PT', {
+                        day: '2-digit',
+                        month: '2-digit'
+                    });
+                    smsSentTime = smsDate.toLocaleTimeString('pt-PT', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+                
+                // Escape special characters for onclick
+                const safeName = attendee.name ? attendee.name.replace(/'/g, "\\'").replace(/"/g, '&quot;') : '';
+                const safePhone = attendee.phone ? attendee.phone.replace(/'/g, "\\'") : '';
+                const safeId = attendee._id ? attendee._id.toString() : '';
+                
+                row.innerHTML = `
+                    <td>${(currentPage - 1) * itemsPerPage + index + 1}</td>
+                    <td class="attendee-name">${attendee.name || 'N/A'}</td>
+                    <td class="attendee-phone">${formatPhone(attendee.phone || '')}</td>
+                    <td>
+                        <span class="sms-status ${attendee.smsSent ? 'sent' : 'not-sent'}" 
+                              title="${attendee.smsSent ? `Enviado em ${smsSentDate} ${smsSentTime}` : 'Pendente'}">
+                            <i class="fas ${attendee.smsSent ? 'fa-check-circle' : 'fa-clock'}"></i>
+                            ${attendee.smsSent ? 'Enviado' : 'Pendente'}
+                            ${attendee.smsSent && smsSentDate ? `<br><small>${smsSentDate}</small>` : ''}
+                        </span>
+                    </td>
+                    <td class="registration-date">
+                        ${formattedDate}<br>
+                        <small>${formattedTime}</small>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            ${!attendee.smsSent && safeId ? 
+                                `<button class="action-btn send-sms" onclick="openSmsModal('${safeId}', '${safeName}')">
+                                    <i class="fas fa-paper-plane"></i> SMS
+                                </button>` 
+                                : ''
+                            }
+                            <button class="action-btn" onclick="copyPhone('${safePhone}')" title="Copiar telefone">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            ${safeId ? 
+                                `<button class="action-btn delete-btn" onclick="deleteAttendee('${safeId}', '${safeName}')" title="Eliminar inscrição">
+                                    <i class="fas fa-trash"></i>
+                                </button>` 
+                                : ''
+                            }
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
             });
         }
+    }
+    
+    // Update pagination controls
+    function updatePagination() {
+        const totalItems = paginationInfo.total || 0;
+        const totalPages = paginationInfo.totalPages || 1;
         
-        res.json({
-            success: true,
-            message: 'Inscrição eliminada com sucesso',
-            data: deleted
+        // Update info
+        const startItem = Math.min((currentPage - 1) * itemsPerPage + 1, totalItems);
+        const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+        document.getElementById('paginationInfo').textContent = 
+            `Mostrando ${startItem}-${endItem} de ${totalItems} inscrições`;
+        
+        // Update buttons
+        document.getElementById('prevPage').disabled = currentPage === 1;
+        document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
+        
+        // Update page numbers
+        const pageNumbers = document.getElementById('pageNumbers');
+        pageNumbers.innerHTML = '';
+        
+        const maxPagesToShow = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+        let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+        
+        // Adjust start if we're at the end
+        if (endPage - startPage + 1 < maxPagesToShow) {
+            startPage = Math.max(1, endPage - maxPagesToShow + 1);
+        }
+        
+        // Always show first page if not visible
+        if (startPage > 1) {
+            const firstPageBtn = document.createElement('div');
+            firstPageBtn.className = 'page-number';
+            firstPageBtn.textContent = '1';
+            firstPageBtn.onclick = () => goToPage(1);
+            pageNumbers.appendChild(firstPageBtn);
+            
+            if (startPage > 2) {
+                const ellipsis = document.createElement('div');
+                ellipsis.className = 'page-number';
+                ellipsis.textContent = '...';
+                ellipsis.style.cursor = 'default';
+                pageNumbers.appendChild(ellipsis);
+            }
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            const pageBtn = document.createElement('div');
+            pageBtn.className = `page-number ${i === currentPage ? 'active' : ''}`;
+            pageBtn.textContent = i;
+            pageBtn.onclick = () => goToPage(i);
+            pageNumbers.appendChild(pageBtn);
+        }
+        
+        // Always show last page if not visible
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                const ellipsis = document.createElement('div');
+                ellipsis.className = 'page-number';
+                ellipsis.textContent = '...';
+                ellipsis.style.cursor = 'default';
+                pageNumbers.appendChild(ellipsis);
+            }
+            
+            const lastPageBtn = document.createElement('div');
+            lastPageBtn.className = 'page-number';
+            lastPageBtn.textContent = totalPages;
+            lastPageBtn.onclick = () => goToPage(totalPages);
+            pageNumbers.appendChild(lastPageBtn);
+        }
+    }
+    
+    // Clear search
+    function clearSearch() {
+        document.getElementById('searchInput').value = '';
+        searchQuery = '';
+        currentPage = 1;
+        loadAttendees();
+    }
+    
+    // Pagination functions
+    function changePage(delta) {
+        const newPage = currentPage + delta;
+        if (newPage >= 1 && newPage <= (paginationInfo.totalPages || 1)) {
+            currentPage = newPage;
+            loadAttendees();
+            // Scroll to top of table
+            document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+    
+    function goToPage(page) {
+        currentPage = page;
+        loadAttendees();
+        // Scroll to top of table
+        document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Search functionality with debounce
+    let searchTimeout;
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            searchQuery = e.target.value;
+            currentPage = 1;
+            loadAttendees();
+        }, 300);
+    });
+    
+    // Filter functions
+    function setFilter(filter) {
+        currentFilter = filter;
+        currentPage = 1;
+        
+        // Update filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        loadAttendees();
+    }
+    
+    // Sorting
+    function sortTable(field) {
+        if (sortField === field) {
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = field;
+            sortDirection = 'asc';
+        }
+        
+        // Update sort indicator
+        document.querySelectorAll('th').forEach(th => {
+            const icon = th.querySelector('i.fa-sort-up, i.fa-sort-down');
+            if (icon) icon.remove();
         });
         
-    } catch (e) {
-        console.error('[DELETE /api/attendance/public/:id] error', e);
-        res.status(500).json({
-            success: false,
-            message: 'Erro ao eliminar inscrição'
+        const currentTh = event.target.closest('th');
+        const sortIcon = document.createElement('i');
+        sortIcon.className = `fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'}`;
+        sortIcon.style.marginLeft = '5px';
+        currentTh.appendChild(sortIcon);
+        
+        currentPage = 1;
+        loadAttendees();
+    }
+    
+    // SMS Modal
+    let selectedAttendeeId = null;
+    let selectedAttendeeName = null;
+    
+    function openSmsModal(attendeeId, attendeeName) {
+        selectedAttendeeId = attendeeId;
+        selectedAttendeeName = attendeeName;
+        
+        document.getElementById('smsModalText').innerHTML = `
+            <p>Enviar SMS de confirmação para <strong>${attendeeName}</strong>?</p>
+            <p style="margin-top: 10px; font-size: 0.9em; color: var(--text-secondary);">
+                Será enviada uma mensagem de agradecimento com os detalhes do evento.
+            </p>
+        `;
+        
+        document.getElementById('smsModal').classList.add('active');
+    }
+    
+    function closeModal() {
+        document.getElementById('smsModal').classList.remove('active');
+        selectedAttendeeId = null;
+        selectedAttendeeName = null;
+    }
+    
+    async function sendSMS() {
+        const btn = document.getElementById('confirmSmsBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        btn.disabled = true;
+        
+        try {
+            const response = await fetch(`${API_URL}/attendance/${selectedAttendeeId}/send-sms`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                document.getElementById('smsModalText').innerHTML = `
+                    <div style="text-align: center;">
+                        <i class="fas fa-check-circle" style="color: #28a745; font-size: 3rem; margin-bottom: 15px;"></i>
+                        <p><strong>SMS enviado com sucesso!</strong></p>
+                        <p style="margin-top: 10px; font-size: 0.9em; color: var(--text-secondary);">
+                            Mensagem enviada para ${selectedAttendeeName}
+                        </p>
+                    </div>
+                `;
+                
+                btn.innerHTML = '<i class="fas fa-check"></i> Concluído';
+                
+                // Update UI and close modal after delay
+                setTimeout(() => {
+                    closeModal();
+                    refreshData();
+                }, 1500);
+            } else {
+                document.getElementById('smsModalText').innerHTML = `
+                    <div style="text-align: center;">
+                        <i class="fas fa-exclamation-triangle" style="color: #dc3545; font-size: 3rem; margin-bottom: 15px;"></i>
+                        <p><strong>Erro ao enviar SMS</strong></p>
+                        <p style="margin-top: 10px; font-size: 0.9em; color: var(--text-secondary);">
+                            ${result.message || 'Erro desconhecido. Tente novamente.'}
+                        </p>
+                    </div>
+                `;
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        } catch (error) {
+            console.error('Error sending SMS:', error);
+            document.getElementById('smsModalText').innerHTML = `
+                <div style="text-align: center;">
+                    <i class="fas fa-exclamation-triangle" style="color: #dc3545; font-size: 3rem; margin-bottom: 15px;"></i>
+                    <p><strong>Erro de conexão</strong></p>
+                    <p style="margin-top: 10px; font-size: 0.9em; color: var(--text-secondary);">
+                        Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.
+                    </p>
+                </div>
+            `;
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+    
+    // Delete attendee
+    async function deleteAttendee(attendeeId, attendeeName) {
+        if (!confirm(`Tem certeza que deseja eliminar a inscrição de ${attendeeName}? Esta ação não pode ser desfeita.`)) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${API_URL}/attendance/public/${attendeeId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showNotification(`Inscrição de ${attendeeName} eliminada com sucesso!`, 'success');
+                refreshData();
+            } else {
+                showNotification(`Erro ao eliminar inscrição: ${result.message || 'Erro desconhecido'}`, 'error');
+            }
+        } catch (error) {
+            console.error('Error deleting attendee:', error);
+            showNotification('Erro de conexão. Tente novamente.', 'error');
+        }
+    }
+    
+    // Utility functions
+    function formatPhone(phone) {
+        if (!phone) return 'N/A';
+        
+        // Format phone number for display
+        const clean = phone.replace(/\D/g, '');
+        if (clean.length === 9) {
+            return clean.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+        } else if (clean.length === 12 && clean.startsWith('244')) {
+            // Angola international format
+            return clean.replace(/(\d{3})(\d{3})(\d{3})(\d{3})/, '+$1 $2 $3 $4');
+        }
+        return phone;
+    }
+    
+    function copyPhone(phone) {
+        if (!phone || phone === 'N/A') return;
+        
+        navigator.clipboard.writeText(phone.replace(/\s/g, '')).then(() => {
+            // Show notification
+            showNotification('Telefone copiado para a área de transferência!', 'success');
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            showNotification('Erro ao copiar telefone', 'error');
         });
     }
-});
-        
-    </script>
     
+    function refreshData() {
+        const btn = document.querySelector('.btn-admin.secondary');
+        if (btn) {
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Atualizando...';
+            btn.disabled = true;
+            
+            loadAttendees();
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }, 1000);
+        } else {
+            loadAttendees();
+        }
+    }
+    
+    async function exportData() {
+        try {
+            showNotification('Preparando exportação...', 'info');
+            
+            // Fetch all data for export
+            const response = await fetch(`${API_URL}/attendance/public?limit=1000`);
+            const data = await response.json();
+            
+            if (!data.success || !data.data || data.data.length === 0) {
+                showNotification('Nenhuma inscrição para exportar', 'warning');
+                return;
+            }
+            
+            const attendees = data.data;
+            
+            // CSV headers
+            const headers = ['Nome', 'Telefone', 'SMS Enviado', 'Data de Inscrição', 'Data do SMS', 'Evento'];
+            const csvRows = [headers.join(',')];
+            
+            // Add data rows
+            attendees.forEach(attendee => {
+                const date = attendee.date ? new Date(attendee.date).toLocaleDateString('pt-PT') : 'N/A';
+                const smsDate = attendee.smsSentAt ? new Date(attendee.smsSentAt).toLocaleDateString('pt-PT') : 'N/A';
+                const row = [
+                    `"${attendee.name || 'N/A'}"`,
+                    attendee.phone || 'N/A',
+                    attendee.smsSent ? 'Sim' : 'Não',
+                    date,
+                    smsDate,
+                    attendee.event || 'N/A'
+                ];
+                csvRows.push(row.join(','));
+            });
+            
+            // Create and download CSV
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            const timestamp = new Date().toISOString().split('T')[0];
+            link.download = `inscricoes-${timestamp}.csv`;
+            link.click();
+            
+            showNotification('Dados exportados com sucesso!', 'success');
+            
+        } catch (error) {
+            console.error('Error exporting data:', error);
+            showNotification('Erro ao exportar dados', 'error');
+        }
+    }
+    
+    // Debug function to test connection
+    async function testConnection() {
+        try {
+            showNotification('Testando conexão com o servidor...', 'info');
+            
+            // Test basic health
+            const healthResponse = await fetch(`${API_URL}/health`);
+            const healthData = await healthResponse.json();
+            console.log('Health check:', healthData);
+            
+            // Test attendance debug endpoint
+            const debugResponse = await fetch(`${API_URL}/attendance/debug`);
+            const debugData = await debugResponse.json();
+            console.log('Debug data:', debugData);
+            
+            if (debugData.success) {
+                showNotification(`Conexão OK! ${debugData.totalRecords} registros encontrados no banco de dados.`, 'success');
+                
+                // If no data, show message
+                if (debugData.totalRecords === 0) {
+                    showNotification('Nenhum registro encontrado no banco de dados.', 'warning');
+                } else {
+                    // Show events found
+                    if (debugData.eventCounts && debugData.eventCounts.length > 0) {
+                        const events = debugData.eventCounts.map(e => `${e._id}: ${e.count}`).join(', ');
+                        showNotification(`Eventos encontrados: ${events}`, 'info');
+                    }
+                    // Reload data
+                    refreshData();
+                }
+            } else {
+                showNotification('Erro na conexão: ' + (debugData.error || 'Desconhecido'), 'error');
+            }
+        } catch (error) {
+            console.error('Test connection error:', error);
+            showNotification('Falha na conexão: ' + error.message, 'error');
+        }
+    }
+    
+    // Notification system
+    function showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+            <span>${message}</span>
+            <button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+        `;
+        
+        // Add styles if not already added
+        if (!document.getElementById('notification-styles')) {
+            const style = document.createElement('style');
+            style.id = 'notification-styles';
+            style.textContent = `
+                .notification {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: rgba(26, 26, 26, 0.95);
+                    border-left: 4px solid var(--secondary);
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    color: var(--text);
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    min-width: 300px;
+                    max-width: 400px;
+                    z-index: 9999;
+                    backdrop-filter: blur(10px);
+                    animation: slideIn 0.3s ease;
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                }
+                .notification-success { border-color: #28a745; }
+                .notification-error { border-color: #dc3545; }
+                .notification-warning { border-color: #ffc107; }
+                .notification-info { border-color: var(--secondary); }
+                .notification i:first-child { font-size: 1.2rem; }
+                .notification span { flex: 1; }
+                .notification button {
+                    background: none;
+                    border: none;
+                    color: var(--text-secondary);
+                    cursor: pointer;
+                    padding: 5px;
+                }
+                .notification button:hover { color: var(--text); }
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        document.body.appendChild(notification);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+    
+    function showError(message) {
+        showNotification(message, 'error');
+    }
+    
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        // Ctrl/Cmd + F to focus search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+            e.preventDefault();
+            document.getElementById('searchInput').focus();
+        }
+        
+        // Esc to clear search
+        if (e.key === 'Escape' && document.getElementById('searchInput').value) {
+            clearSearch();
+        }
+        
+        // Ctrl/Cmd + R to refresh
+        if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+            e.preventDefault();
+            refreshData();
+        }
+        
+        // Ctrl/Cmd + E to export
+        if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+            e.preventDefault();
+            exportData();
+        }
+    });
+</script>
 </body>
 </html>
