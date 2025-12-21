@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messenger - Aprenda & Empreenda</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #000000;
+            --secondary: #B22222;
+            --accent: #D32F2F;
+            --light: #1A1A1A;
+            --dark: #0A0A0A;
+            --text: #FFFFFF;
+            --text-secondary: #CCCCCC;
+            --success: #28a745;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            --gradient: linear-gradient(135deg, #000000 0%, #1A1A1A 100%);
+            --red-gradient: linear-gradient(135deg, #B22222 0%, #D32F2F 100%);
+            --red-gradient-hover: linear-gradient(135deg, #D32F2F 0%, #FF5252 100%);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text);
+            background-color: var(--primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .messenger-header {
+            background: var(--gradient);
+            padding: 25px 0;
+            border-bottom: 3px solid var(--secondary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-header {
+            height: 60px;
+            filter: drop-shadow(0 0 15px rgba(178, 34, 34, 0.6));
+        }
+
+        .messenger-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .messenger-title span {
+            color: var(--secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-messenger {
+            background: var(--red-gradient);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-messenger:hover {
+            background: var(--red-gradient-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(178, 34, 34, 0.3);
+        }
+
+        .btn-messenger.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-messenger.secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Main Content */
+        .messenger-content {
+            padding: 40px 0;
+            background: var(--gradient);
+            min-height: calc(100vh - 120px);
+        }
+
+        /* Messenger Grid */
+        .messenger-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 992px) {
+            .messenger-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Message Form */
+        .message-form-container {
+            background: rgba(26, 26, 26, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--text);
+            margin-bottom: 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 3px;
+            background: var(--red-gradient);
+            bottom: -8px;
+            left: 0;
+            border-radius: 2px;
+        }
+
+        .section-title i {
+            color: var(--secondary);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text);
+            letter-spacing: 0.5px;
+        }
+
+        .form-group .helper-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            color: var(--text);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(178, 34, 34, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Phone Input Styles */
+        .phone-input-container {
+            position: relative;
+        }
+
+        .phone-count {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Import Options */
+        .import-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .import-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .import-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .import-btn.active {
+            background: var(--red-gradient);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        /* Character Counter */
+        .char-counter {
+            text-align: right;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .char-counter.warning {
+            color: var(--warning);
+        }
+
+        .char-counter.danger {
+            color: var(--accent);
+        }
+
+        /* Preview Panel */
+        .preview-panel {
+            background: rgba(26, 26, 26, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .preview-content {
+            flex: 1;
+            background: rgba(10, 10, 10, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .preview-item {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--secondary);
+        }
+
+        .preview-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .preview-number {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 5px;
+            font-family: monospace;
+        }
+
+        .preview-message {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .preview-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        /* Send Button */
+        .send-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn-send {
+            background: var(--red-gradient);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .btn-send:hover:not(:disabled) {
+            background: var(--red-gradient-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(178, 34, 34, 0.4);
+        }
+
+        .btn-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-send:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s ease;
+        }
+
+        .btn-send:hover:not(:disabled):after {
+            left: 100%;
+        }
+
+        /* Results Panel */
+        .results-panel {
+            background: rgba(26, 26, 26, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            margin-top: 40px;
+            display: none;
+        }
+
+        .results-panel.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: rgba(10, 10, 10, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid;
+        }
+
+        .result-card.success {
+            border-left-color: var(--success);
+        }
+
+        .result-card.error {
+            border-left-color: var(--accent);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .result-phone {
+            font-weight: 600;
+            color: var(--text);
+            font-family: monospace;
+        }
+
+        .result-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .result-status.success {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+        }
+
+        .result-status.error {
+            background: rgba(211, 47, 47, 0.1);
+            color: var(--accent);
+        }
+
+        .result-message {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(26, 26, 26, 0.95);
+            border-left: 4px solid var(--secondary);
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 300px;
+            max-width: 400px;
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+
+        .notification.active {
+            display: flex;
+        }
+
+        .notification-success { border-color: #28a745; }
+        .notification-error { border-color: #dc3545; }
+        .notification-warning { border-color: #ffc107; }
+        .notification-info { border-color: var(--secondary); }
+
+        .notification i:first-child { font-size: 1.2rem; }
+        .notification span { flex: 1; }
+        .notification button {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .notification button:hover { color: var(--text); }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .loading-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: var(--text);
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .header-actions {
+                justify-content: center;
+            }
+            
+            .messenger-title {
+                font-size: 1.5rem;
+            }
+            
+            .preview-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .message-form-container,
+            .preview-panel {
+                padding: 20px;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .import-options {
+                flex-direction: column;
+            }
+            
+            .import-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="messenger-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-container">
+                    <img src="logo.png" alt="Aprenda & Empreenda" class="logo-header" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"80\" viewBox=\"0 0 200 80\"><rect width=\"200\" height=\"80\" fill=\"black\"/><text x=\"100\" y=\"40\" font-family=\"Arial\" font-size=\"24\" fill=\"white\" text-anchor=\"middle\" dy=\".3em\">APRENDA &</text><text x=\"100\" y=\"60\" font-family=\"Arial\" font-size=\"24\" fill=\"%23B22222\" text-anchor=\"middle\" dy=\".3em\">EMPRENDA</text></svg>';">
+                    <h1 class="messenger-title">Messenger <span>SMS</span></h1>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-messenger secondary" onclick="importFromAttendees()">
+                        <i class="fas fa-users"></i> Importar Inscritos
+                    </button>
+                    <button class="btn-messenger secondary" onclick="checkBalance()">
+                        <i class="fas fa-coins"></i> Ver Saldo
+                    </button>
+                    <button class="btn-messenger" onclick="window.location.href='admin.html'">
+                        <i class="fas fa-arrow-left"></i> Voltar ao Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="messenger-content">
+        <div class="container">
+            <!-- Messenger Grid -->
+            <div class="messenger-grid">
+                <!-- Message Form -->
+                <div class="message-form-container">
+                    <h2 class="section-title">
+                        <i class="fas fa-paper-plane"></i> Enviar Mensagem
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label for="phoneNumbers">
+                            <i class="fas fa-phone"></i> Números de Telefone
+                        </label>
+                        <div class="phone-input-container">
+                            <textarea 
+                                id="phoneNumbers" 
+                                class="form-control" 
+                                placeholder="Digite os números de telefone (um por linha ou separados por vírgula)
+Exemplo: 
+923456789
+924567890
+925678901"
+                                rows="6"
+                            ></textarea>
+                            <div class="phone-count" id="phoneCount">0 números</div>
+                        </div>
+                        <div class="helper-text">
+                            Digite números de telefone angolanos (9 dígitos). Suporta vírgulas, pontos e vírgulas, ou quebras de linha.
+                        </div>
+                        
+                        <div class="import-options">
+                            <button class="import-btn" onclick="importSample()">
+                                <i class="fas fa-vial"></i> Exemplo
+                            </button>
+                            <button class="import-btn" onclick="clearNumbers()">
+                                <i class="fas fa-trash"></i> Limpar
+                            </button>
+                            <button class="import-btn" onclick="validateNumbers()">
+                                <i class="fas fa-check"></i> Validar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">
+                            <i class="fas fa-comment-alt"></i> Mensagem
+                        </label>
+                        <textarea 
+                            id="message" 
+                            class="form-control" 
+                            placeholder="Digite sua mensagem aqui..."
+                            rows="6"
+                        ></textarea>
+                        <div class="char-counter" id="charCounter">
+                            <span id="charCount">0</span>/160 caracteres
+                        </div>
+                        <div class="helper-text">
+                            Mensagens longas serão divididas automaticamente.
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sender">
+                            <i class="fas fa-user-tag"></i> Remetente
+                        </label>
+                        <input 
+                            type="text" 
+                            id="sender" 
+                            class="form-control" 
+                            value="APRENDAEMPR"
+                            placeholder="Nome do remetente (aprovado no Ombala)"
+                        >
+                        <div class="helper-text">
+                            Nome do remetente deve estar pré-aprovado no sistema Ombala.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Preview Panel -->
+                <div class="preview-panel">
+                    <div class="preview-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-eye"></i> Pré-visualização
+                        </h2>
+                        <button class="btn-messenger secondary" onclick="updatePreview()">
+                            <i class="fas fa-sync"></i> Atualizar
+                        </button>
+                    </div>
+                    
+                    <div class="preview-content" id="previewContent">
+                        <div class="preview-item">
+                            <div class="preview-number">923456789</div>
+                            <div class="preview-message" id="previewMessage">
+                                Digite uma mensagem para ver a pré-visualização...
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="previewCount">0</div>
+                            <div class="stat-label">Números</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="previewSms">0</div>
+                            <div class="stat-label">SMS</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="previewCost">0</div>
+                            <div class="stat-label">Custo (estimado)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Send Button -->
+            <div class="send-section">
+                <button class="btn-send" onclick="sendMessages()" id="sendButton">
+                    <i class="fas fa-paper-plane"></i> Enviar Mensagens
+                </button>
+            </div>
+            
+            <!-- Results Panel -->
+            <div class="results-panel" id="resultsPanel">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-bar"></i> Resultados do Envio
+                </h2>
+                
+                <div class="results-grid" id="resultsGrid">
+                    <!-- Results will be added here -->
+                </div>
+                
+                <div class="preview-stats" id="resultsStats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="resultsTotal">0</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="resultsSuccess">0</div>
+                        <div class="stat-label">Sucesso</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="resultsFailed">0</div>
+                        <div class="stat-label">Falhas</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3 id="loadingText">Enviando mensagens...</h3>
+            <p id="loadingProgress">Processando 0 de 0</p>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-info-circle"></i>
+        <span id="notificationText">Notificação</span>
+        <button onclick="hideNotification()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'https://hs-node-api.vercel.app/api';
+        
+        // Global state
+        let currentResults = null;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Messenger initialized');
+            
+            // Add event listeners
+            document.getElementById('phoneNumbers').addEventListener('input', updatePreview);
+            document.getElementById('message').addEventListener('input', updatePreview);
+            
+            // Initial preview
+            updatePreview();
+        });
+        
+        // Update preview
+        function updatePreview() {
+            const phoneNumbers = getPhoneNumbers();
+            const message = document.getElementById('message').value.trim();
+            
+            // Update counts
+            document.getElementById('phoneCount').textContent = `${phoneNumbers.length} números`;
+            document.getElementById('previewCount').textContent = phoneNumbers.length;
+            
+            // Calculate SMS count (160 chars per SMS)
+            const smsCount = calculateSmsCount(message);
+            document.getElementById('previewSms').textContent = smsCount;
+            
+            // Calculate estimated cost (1 SMS = 1.5 Kz)
+            const estimatedCost = smsCount * phoneNumbers.length * 1.5;
+            document.getElementById('previewCost').textContent = `${estimatedCost.toFixed(0)} Kz`;
+            
+            // Update character counter
+            const charCount = message.length;
+            document.getElementById('charCount').textContent = charCount;
+            const charCounter = document.getElementById('charCounter');
+            
+            if (charCount > 160) {
+                charCounter.classList.add('danger');
+                charCounter.classList.remove('warning');
+            } else if (charCount > 140) {
+                charCounter.classList.add('warning');
+                charCounter.classList.remove('danger');
+            } else {
+                charCounter.classList.remove('warning', 'danger');
+            }
+            
+            // Update preview message
+            const previewMessage = document.getElementById('previewMessage');
+            if (message) {
+                previewMessage.textContent = message;
+            } else {
+                previewMessage.textContent = 'Digite uma mensagem para ver a pré-visualização...';
+            }
+            
+            // Update preview numbers
+            const previewContent = document.getElementById('previewContent');
+            if (phoneNumbers.length > 0) {
+                let previewHTML = '';
+                phoneNumbers.slice(0, 5).forEach(phone => {
+                    previewHTML += `
+                        <div class="preview-item">
+                            <div class="preview-number">${formatPhone(phone)}</div>
+                            <div class="preview-message">${message.substring(0, 100)}${message.length > 100 ? '...' : ''}</div>
+                        </div>
+                    `;
+                });
+                
+                if (phoneNumbers.length > 5) {
+                    previewHTML += `
+                        <div class="preview-item">
+                            <div class="preview-number">...</div>
+                            <div class="preview-message">+${phoneNumbers.length - 5} mais números</div>
+                        </div>
+                    `;
+                }
+                
+                previewContent.innerHTML = previewHTML;
+            } else {
+                previewContent.innerHTML = `
+                    <div class="preview-item">
+                        <div class="preview-number">Nenhum número</div>
+                        <div class="preview-message">Adicione números para ver a pré-visualização</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Get and parse phone numbers
+        function getPhoneNumbers() {
+            const input = document.getElementById('phoneNumbers').value.trim();
+            if (!input) return [];
+            
+            // Split by commas, semicolons, spaces, or newlines
+            const numbers = input.split(/[,;\s\n]+/)
+                .map(num => num.trim())
+                .filter(num => num.length > 0);
+            
+            // Clean and validate numbers
+            return numbers.map(cleanPhoneNumber).filter(num => num && num.length === 9);
+        }
+        
+        // Clean phone number
+        function cleanPhoneNumber(phone) {
+            // Remove all non-digit characters
+            let clean = phone.replace(/\D/g, '');
+            
+            // Angolan mobile numbers: 9 digits starting with 9 or 2
+            if (clean.length === 9 && (clean.startsWith('9') || clean.startsWith('2'))) {
+                return clean;
+            }
+            
+            // If number starts with 0 and is 10 digits
+            if (clean.startsWith('0') && clean.length === 10) {
+                return clean.substring(1);
+            }
+            
+            // If number is 12 digits with 244 country code
+            if (clean.length === 12 && clean.startsWith('244')) {
+                return clean.substring(3);
+            }
+            
+            // Invalid number
+            return null;
+        }
+        
+        // Format phone for display
+        function formatPhone(phone) {
+            if (!phone) return '';
+            if (phone.length === 9) {
+                return phone.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+            }
+            return phone;
+        }
+        
+        // Calculate SMS count
+        function calculateSmsCount(message) {
+            if (!message) return 0;
+            return Math.ceil(message.length / 160);
+        }
+        
+        // Import sample numbers
+        function importSample() {
+            const sampleNumbers = [
+                '923456789',
+                '924567890',
+                '925678901',
+                '926789012',
+                '927890123'
+            ].join('\n');
+            
+            document.getElementById('phoneNumbers').value = sampleNumbers;
+            document.getElementById('message').value = 'Olá! Esta é uma mensagem de teste do sistema Aprenda & Empreenda. Obrigado pela sua atenção!';
+            updatePreview();
+            
+            showNotification('Exemplo importado com sucesso!', 'success');
+        }
+        
+        // Clear numbers
+        function clearNumbers() {
+            document.getElementById('phoneNumbers').value = '';
+            updatePreview();
+            showNotification('Números limpos!', 'info');
+        }
+        
+        // Validate numbers
+        function validateNumbers() {
+            const numbers = getPhoneNumbers();
+            const invalidNumbers = [];
+            const validNumbers = [];
+            
+            const input = document.getElementById('phoneNumbers').value.trim();
+            const rawNumbers = input.split(/[,;\s\n]+/)
+                .map(num => num.trim())
+                .filter(num => num.length > 0);
+            
+            rawNumbers.forEach((raw, index) => {
+                const cleaned = cleanPhoneNumber(raw);
+                if (!cleaned || cleaned.length !== 9) {
+                    invalidNumbers.push(raw);
+                } else {
+                    validNumbers.push(cleaned);
+                }
+            });
+            
+            if (invalidNumbers.length > 0) {
+                showNotification(`${invalidNumbers.length} números inválidos encontrados. Foram removidos.`, 'warning');
+                document.getElementById('phoneNumbers').value = validNumbers.join('\n');
+                updatePreview();
+            } else {
+                showNotification('Todos os números são válidos!', 'success');
+            }
+        }
+        
+        // Import from attendees
+        async function importFromAttendees() {
+            try {
+                showLoading('Importando inscritos...');
+                
+                const response = await fetch(`${API_URL}/attendance/public?limit=1000`);
+                const data = await response.json();
+                
+                if (data.success && data.data && data.data.length > 0) {
+                    const phoneNumbers = data.data
+                        .map(attendee => attendee.phone)
+                        .filter(phone => phone)
+                        .map(cleanPhoneNumber)
+                        .filter(phone => phone && phone.length === 9)
+                        .slice(0, 100); // Limit to 100 numbers
+                    
+                    if (phoneNumbers.length > 0) {
+                        document.getElementById('phoneNumbers').value = phoneNumbers.join('\n');
+                        updatePreview();
+                        showNotification(`${phoneNumbers.length} números importados dos inscritos!`, 'success');
+                    } else {
+                        showNotification('Nenhum número válido encontrado nos inscritos.', 'warning');
+                    }
+                } else {
+                    showNotification('Nenhum inscrito encontrado.', 'warning');
+                }
+                
+                hideLoading();
+            } catch (error) {
+                console.error('Error importing attendees:', error);
+                showNotification('Erro ao importar inscritos: ' + error.message, 'error');
+                hideLoading();
+            }
+        }
+        
+        // Check balance
+        async function checkBalance() {
+            try {
+                showLoading('Verificando saldo...');
+                
+                const response = await fetch(`${API_URL}/messenger/balance`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification(`Saldo disponível: ${data.data.balance || 'N/A'}`, 'success');
+                } else {
+                    showNotification('Erro ao verificar saldo: ' + (data.message || 'Desconhecido'), 'error');
+                }
+                
+                hideLoading();
+            } catch (error) {
+                console.error('Error checking balance:', error);
+                showNotification('Erro ao verificar saldo: ' + error.message, 'error');
+                hideLoading();
+            }
+        }
+        
+        // Send messages
+        async function sendMessages() {
+            const phoneNumbers = getPhoneNumbers();
+            const message = document.getElementById('message').value.trim();
+            const sender = document.getElementById('sender').value.trim();
+            
+            // Validation
+            if (phoneNumbers.length === 0) {
+                showNotification('Adicione pelo menos um número de telefone!', 'error');
+                return;
+            }
+            
+            if (!message) {
+                showNotification('Digite uma mensagem!', 'error');
+                return;
+            }
+            
+            if (!sender) {
+                showNotification('Digite o nome do remetente!', 'error');
+                return;
+            }
+            
+            // Confirm before sending
+            const smsCount = calculateSmsCount(message) * phoneNumbers.length;
+            const confirmMessage = `Enviar ${smsCount} SMS para ${phoneNumbers.length} números?\n\nCusto estimado: ${(smsCount * 1.5).toFixed(0)} Kz`;
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            // Disable send button
+            const sendButton = document.getElementById('sendButton');
+            sendButton.disabled = true;
+            sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+            
+            // Show loading
+            showLoading(`Enviando ${phoneNumbers.length} mensagens...`);
+            
+            try {
+                const response = await fetch(`${API_URL}/messenger/send`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phoneNumbers: phoneNumbers,
+                        message: message,
+                        sender: sender
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentResults = data;
+                    showResults(data);
+                    showNotification(`Mensagens enviadas! ${data.stats.successful} sucesso, ${data.stats.failed} falhas.`, 'success');
+                } else {
+                    showNotification('Erro ao enviar mensagens: ' + (data.message || 'Desconhecido'), 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error sending messages:', error);
+                showNotification('Erro de conexão: ' + error.message, 'error');
+            } finally {
+                // Re-enable send button
+                sendButton.disabled = false;
+                sendButton.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Mensagens';
+                hideLoading();
+            }
+        }
+        
+        // Show results
+        function showResults(data) {
+            const resultsPanel = document.getElementById('resultsPanel');
+            const resultsGrid = document.getElementById('resultsGrid');
+            const resultsStats = document.getElementById('resultsStats');
+            
+            // Update stats
+            document.getElementById('resultsTotal').textContent = data.stats.total;
+            document.getElementById('resultsSuccess').textContent = data.stats.successful;
+            document.getElementById('resultsFailed').textContent = data.stats.failed;
+            
+            // Show results grid
+            let resultsHTML = '';
+            data.results.forEach(result => {
+                const statusClass = result.success ? 'success' : 'error';
+                const statusText = result.success ? 'Enviado' : 'Falhou';
+                const statusIcon = result.success ? 'fa-check-circle' : 'fa-times-circle';
+                
+                resultsHTML += `
+                    <div class="result-card ${statusClass}">
+                        <div class="result-header">
+                            <div class="result-phone">${formatPhone(result.phone)}</div>
+                            <div class="result-status ${statusClass}">
+                                <i class="fas ${statusIcon}"></i> ${statusText}
+                            </div>
+                        </div>
+                        ${result.error ? `<div class="result-message">${result.error}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            resultsGrid.innerHTML = resultsHTML;
+            resultsPanel.classList.add('active');
+            
+            // Scroll to results
+            resultsPanel.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Loading functions
+        function showLoading(text = 'Processando...') {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+        
+        // Notification functions
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.className = `notification notification-${type} active`;
+            
+            // Auto hide after 5 seconds
+            setTimeout(hideNotification, 5000);
+        }
+        
+        function hideNotification() {
+            document.getElementById('notification').classList.remove('active');
+        }
+        
+        // Helper function for sample message templates
+        function insertTemplate(template) {
+            const templates = {
+                'welcome': 'Olá! Bem-vindo ao evento Aprenda & Empreenda. Estamos ansiosos para vê-lo!',
+                'reminder': 'Lembrete: Evento Aprenda & Empreenda amanhã às 8h no Shopping Popular (Camama).',
+                'thanks': 'Obrigado por participar do evento Aprenda & Empreenda! Esperamos que tenha sido proveitoso.',
+                'followup': 'Olá! Como foi sua experiência no evento? Temos mais conteúdos disponíveis.'
+            };
+            
+            if (templates[template]) {
+                document.getElementById('message').value = templates[template];
+                updatePreview();
+                showNotification('Template inserido!', 'success');
+            }
+        }
+        
+        // Add template buttons to header actions (optional)
+        function addTemplateButtons() {
+            const headerActions = document.querySelector('.header-actions');
+            if (headerActions) {
+                const templateBtn = document.createElement('button');
+                templateBtn.className = 'btn-messenger secondary';
+                templateBtn.innerHTML = '<i class="fas fa-file-alt"></i> Templates';
+                templateBtn.onclick = () => {
+                    if (confirm('Inserir template de boas-vindas?')) {
+                        insertTemplate('welcome');
+                    }
+                };
+                headerActions.insertBefore(templateBtn, headerActions.firstChild);
+            }
+        }
+        
+        // Initialize template buttons
+        setTimeout(addTemplateButtons, 1000);
+    </script>
+</body>
+</html>
