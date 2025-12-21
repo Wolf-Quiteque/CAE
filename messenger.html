@@ -345,7 +345,7 @@
 
         .preview-stats {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             margin-top: 20px;
             padding-top: 20px;
@@ -647,9 +647,6 @@
                     <button class="btn-messenger secondary" onclick="importFromAttendees()">
                         <i class="fas fa-users"></i> Importar Inscritos
                     </button>
-                    <button class="btn-messenger secondary" onclick="checkBalance()">
-                        <i class="fas fa-coins"></i> Ver Saldo
-                    </button>
                     <button class="btn-messenger" onclick="window.location.href='admin.html'">
                         <i class="fas fa-arrow-left"></i> Voltar ao Admin
                     </button>
@@ -720,22 +717,6 @@ Exemplo:
                             Mensagens longas serão divididas automaticamente.
                         </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="sender">
-                            <i class="fas fa-user-tag"></i> Remetente
-                        </label>
-                        <input 
-                            type="text" 
-                            id="sender" 
-                            class="form-control" 
-                            value="APRENDAEMPR"
-                            placeholder="Nome do remetente (aprovado no Ombala)"
-                        >
-                        <div class="helper-text">
-                            Nome do remetente deve estar pré-aprovado no sistema Ombala.
-                        </div>
-                    </div>
                 </div>
                 
                 <!-- Preview Panel -->
@@ -765,11 +746,7 @@ Exemplo:
                         </div>
                         <div class="stat-item">
                             <div class="stat-value" id="previewSms">0</div>
-                            <div class="stat-label">SMS</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="previewCost">0</div>
-                            <div class="stat-label">Custo (estimado)</div>
+                            <div class="stat-label">Segmentos SMS</div>
                         </div>
                     </div>
                 </div>
@@ -857,10 +834,6 @@ Exemplo:
             // Calculate SMS count (160 chars per SMS)
             const smsCount = calculateSmsCount(message);
             document.getElementById('previewSms').textContent = smsCount;
-            
-            // Calculate estimated cost (1 SMS = 1.5 Kz)
-            const estimatedCost = smsCount * phoneNumbers.length * 1.5;
-            document.getElementById('previewCost').textContent = `${estimatedCost.toFixed(0)} Kz`;
             
             // Update character counter
             const charCount = message.length;
@@ -1059,33 +1032,10 @@ Exemplo:
             }
         }
         
-        // Check balance
-        async function checkBalance() {
-            try {
-                showLoading('Verificando saldo...');
-                
-                const response = await fetch(`${API_URL}/messenger/balance`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    showNotification(`Saldo disponível: ${data.data.balance || 'N/A'}`, 'success');
-                } else {
-                    showNotification('Erro ao verificar saldo: ' + (data.message || 'Desconhecido'), 'error');
-                }
-                
-                hideLoading();
-            } catch (error) {
-                console.error('Error checking balance:', error);
-                showNotification('Erro ao verificar saldo: ' + error.message, 'error');
-                hideLoading();
-            }
-        }
-        
         // Send messages
         async function sendMessages() {
             const phoneNumbers = getPhoneNumbers();
             const message = document.getElementById('message').value.trim();
-            const sender = document.getElementById('sender').value.trim();
             
             // Validation
             if (phoneNumbers.length === 0) {
@@ -1098,14 +1048,9 @@ Exemplo:
                 return;
             }
             
-            if (!sender) {
-                showNotification('Digite o nome do remetente!', 'error');
-                return;
-            }
-            
             // Confirm before sending
             const smsCount = calculateSmsCount(message) * phoneNumbers.length;
-            const confirmMessage = `Enviar ${smsCount} SMS para ${phoneNumbers.length} números?\n\nCusto estimado: ${(smsCount * 1.5).toFixed(0)} Kz`;
+            const confirmMessage = `Enviar ${smsCount} segmentos SMS para ${phoneNumbers.length} números?`;
             
             if (!confirm(confirmMessage)) {
                 return;
@@ -1127,8 +1072,7 @@ Exemplo:
                     },
                     body: JSON.stringify({
                         phoneNumbers: phoneNumbers,
-                        message: message,
-                        sender: sender
+                        message: message
                     })
                 });
                 
@@ -1157,7 +1101,6 @@ Exemplo:
         function showResults(data) {
             const resultsPanel = document.getElementById('resultsPanel');
             const resultsGrid = document.getElementById('resultsGrid');
-            const resultsStats = document.getElementById('resultsStats');
             
             // Update stats
             document.getElementById('resultsTotal').textContent = data.stats.total;
@@ -1216,41 +1159,6 @@ Exemplo:
         function hideNotification() {
             document.getElementById('notification').classList.remove('active');
         }
-        
-        // Helper function for sample message templates
-        function insertTemplate(template) {
-            const templates = {
-                'welcome': 'Olá! Bem-vindo ao evento Aprenda & Empreenda. Estamos ansiosos para vê-lo!',
-                'reminder': 'Lembrete: Evento Aprenda & Empreenda amanhã às 8h no Shopping Popular (Camama).',
-                'thanks': 'Obrigado por participar do evento Aprenda & Empreenda! Esperamos que tenha sido proveitoso.',
-                'followup': 'Olá! Como foi sua experiência no evento? Temos mais conteúdos disponíveis.'
-            };
-            
-            if (templates[template]) {
-                document.getElementById('message').value = templates[template];
-                updatePreview();
-                showNotification('Template inserido!', 'success');
-            }
-        }
-        
-        // Add template buttons to header actions (optional)
-        function addTemplateButtons() {
-            const headerActions = document.querySelector('.header-actions');
-            if (headerActions) {
-                const templateBtn = document.createElement('button');
-                templateBtn.className = 'btn-messenger secondary';
-                templateBtn.innerHTML = '<i class="fas fa-file-alt"></i> Templates';
-                templateBtn.onclick = () => {
-                    if (confirm('Inserir template de boas-vindas?')) {
-                        insertTemplate('welcome');
-                    }
-                };
-                headerActions.insertBefore(templateBtn, headerActions.firstChild);
-            }
-        }
-        
-        // Initialize template buttons
-        setTimeout(addTemplateButtons, 1000);
     </script>
 </body>
 </html>
